@@ -189,15 +189,17 @@ function gameController(player1Name = "Player One", player2Name = "Player Two")
 
     const getActivePlayer = () => activePlayer;
 
-    const printNewRound = () => {
-        board.printBoard();
-        console.log(`${getActivePlayer().name}'s turn.`);
+    // const printNewRound = () => {
+    //     board.printBoard();
+    //     console.log(`${getActivePlayer().name}'s turn.`);
 
-    };
+    // };
 
-    const playRound = (column) => {
+    const playRound = (row, column) => {
         console.log(`Dropping ${getActivePlayer().name}'s token into column ${column}`)
-    
+        const success = board.placeMarker(row, column, getActivePlayer().token)
+        
+        
         board.dropToken(column, getActivePlayer().token);
     }
 
