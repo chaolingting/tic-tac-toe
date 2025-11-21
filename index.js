@@ -1,96 +1,3 @@
-// //console.log("hello world")
-
-
-
-// function Gameboard(){
-//     const rows = 3;
-//     const columns = 3;
-//     const board = [];
-
-//    for (let i = 0; i < rows; i++){
-//     board[i] = [];
-//     for (let j = 0; j < columns; j++){
-//         board[i].push(cell())
-//     }
-//    }
-
-//    const getBoard = () => board;
-
-//    const dropToken = (column, player) =>{
-//     const availableCells = board
-//     .filter((row) => row[column].getValue() === 0)
-//     .map(row => row[column]);
-
-//     if (!availableCells.length) return;
-
-//     const lowestRow = availableCells.length - 1;
-//     board[lowestRow][column].addToken(player);
-
-//     const printBoard = () => {
-//         const boardWithCellValues = board
-//         .map(row => row.map((cell) => cell.getValue()));
-//         console.log(boardWithCellValues);
-//     };
-
-//     return { getBoard, dropToken, printBoard };
-
-//    };
-
-// };
-
-
-// function Cell(){
-//     let value = 0;
-
-//     const addToken = (player) => {
-//         value = player;
-//     }
-
-//     const getValue = () => value;
-
-//     return { addToken, getValue };
-// }
-
-
-// function GameController(
-//     playerOneName = "Player One",
-//     playerTwoName = "Player Two"
-// ){
-//     const board = Gameboard();
-
-//     const players = [
-//         {
-//             name: playerOneName,
-//             token: 1
-//         },
-//         {
-//             name: playerTwoName,
-//             token: 2
-//         }
-//     ];
-
-//     let activePlayer = players[0];
-
-//     const switchPlayerTurn = () => {
-//         activePlayer = activePlayer === players[0] ? players[1] : players[0];
-//     };
-//     const getActivePlayer = () => activePlayer;
-
-//     const printNewRound = () => {
-//         board.printBoard();
-//         console.log(`${getActivePlayer().name}'s turn.`);
-//     }
-
-//     switchPlayerTurn()
-//     printNewRound()
-
-//     return{playRound, getActivePlayer}
-// }
-
-// const game = GameController()
-
-
-
 
 
 function gameBoard(){
@@ -101,16 +8,14 @@ function gameBoard(){
 //2d array
     for(let i = 0; i < rows; i ++){
         board[i] = [];
-        for(let j = 0; i< columns; j ++){
+        for(let j = 0; j< columns; j ++){
             board[i].push(Cell());
         };
     };
 
     const getBoard = () => board;
 
-    // const placeMarker = (column, player) =>{
-    //     const availableCells = board.filter((row) => row[column].getValue()===0).map(row => row[column]);
-    // };
+
 
     const placeMarker = (row, column, player) => {
         const cell = board[row][column];
@@ -148,13 +53,6 @@ function Cell(){
 
 
 
-// function player(name, marker){
-//     const getName = () => name;
-//     const getMarker = () => marker;
-    
-//     return {getName, getMarker};
-// }
-
 
 
 
@@ -175,13 +73,7 @@ function gameController(player1Name = "Player One", player2Name = "Player Two")
 
     let activePlayer = players[0];
     
-    // const switchPlayer = () => {
-    //     if (activePlayer === player1){
-    //         player1
-    //     } else{
-    //         activePlayer === player2
-    //     }
-    // }
+
 
     const switchPlayerTurn = () => {
         activePlayer = activePlayer === players[0] ? players[1] : players[0];
@@ -189,20 +81,66 @@ function gameController(player1Name = "Player One", player2Name = "Player Two")
 
     const getActivePlayer = () => activePlayer;
 
-    // const printNewRound = () => {
-    //     board.printBoard();
-    //     console.log(`${getActivePlayer().name}'s turn.`);
-
-    // };
 
     const playRound = (row, column) => {
         console.log(`Dropping ${getActivePlayer().name}'s token into column ${column}`)
+
         const success = board.placeMarker(row, column, getActivePlayer().token)
+
+        if(!success){
+            console.log("Cell taken");
+            return;
+        }
+
+        printBoard()
         
+        if(checkWinner(board.getBoard(), activePlayer().token)){
+            console.log(`${getActivePlayer().name} wins!`);
+            return;
+        }
+
+        if(isTie(board.getBoard())){
+            console.log("It's a tie")
+        }
+
+        switchPlayerTurn();
+        console.log(`It's ${getActivePlayer().name}'s turn`);
+
+       
         
-        board.dropToken(column, getActivePlayer().token);
     }
+
+
+ const printBoard = () =>{
+    const values = board.getBoard().map(row => row.map(cell => cell.getValue()));
+    console.table(values);
+ }
+
 
     return {switchPlayerTurn, playRound}
 
 }
+
+function checkWinner(board, token){
+    for(let i = 0; i < 3; i++){
+        if(
+            board[i][0].getValue() === token &&
+            board[i][1].getValue() === token &&
+            board[i][2].getValue() === token 
+        )return true;
+    }
+
+    for(let j = 0; j < 3; j++){
+        if(
+            board[j][0].getValue() === token &&
+            board[i][1].getValue() === token &&
+            board[i][2].getValue() === token
+         )return true;
+    }
+
+
+
+}
+
+
+function DisplayController(){}
