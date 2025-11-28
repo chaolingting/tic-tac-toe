@@ -35,6 +35,9 @@ function gameBoard(){
     };
     };
 
+
+
+
     return {getBoard, placeMarker, resetBoard};
 }
 
@@ -58,6 +61,8 @@ function Cell(){
 
 function gameController(player1Name = "Player One", player2Name = "Player Two")
 {
+    
+    
     const board = gameBoard();
 
     const players = [
@@ -81,8 +86,16 @@ function gameController(player1Name = "Player One", player2Name = "Player Two")
 
     const getActivePlayer = () => activePlayer;
 
+    //Game Over
+    let gameOver = false;
+    const isGameOver = () => gameOver;
+
+    
 
     const playRound = (row, column) => {
+
+        if (gameOver) return; 
+        
         console.log(`Dropping ${getActivePlayer().name}'s token into column ${column}`)
 
         const success = board.placeMarker(row, column, getActivePlayer().token)
@@ -94,13 +107,16 @@ function gameController(player1Name = "Player One", player2Name = "Player Two")
 
         printBoard()
         
-        if(checkWinner(board.getBoard(), activePlayer().token)){
+        if(checkWinner(board.getBoard(), getActivePlayer().token)){
             console.log(`${getActivePlayer().name} wins!`);
+            gameOver = true;
             return;
         }
 
         if(isTie(board.getBoard())){
             console.log("It's a tie")
+            gameOver = true;
+            return;
         }
 
         switchPlayerTurn();
@@ -117,7 +133,7 @@ function gameController(player1Name = "Player One", player2Name = "Player Two")
  }
 
 
-    return {switchPlayerTurn, playRound}
+    return {switchPlayerTurn, playRound, getActivePlayer, getBoard: board.getBoard, isGameOver, resetBoard: board.resetBoard }
 
 }
 
@@ -129,18 +145,107 @@ function checkWinner(board, token){
             board[i][2].getValue() === token 
         )return true;
     }
-
+ 
     for(let j = 0; j < 3; j++){
         if(
-            board[j][0].getValue() === token &&
-            board[i][1].getValue() === token &&
-            board[i][2].getValue() === token
+            board[0][j].getValue() === token &&
+            board[1][j].getValue() === token &&
+            board[2][j].getValue() === token
          )return true;
     }
 
 
+    if(
+        board[0][0].getValue() === token &&
+        board[1][1].getValue() === token &&
+        board[2][2].getValue() === token 
+    ) return true
+
+    if(
+        board[0][2].getValue() === token &&
+        board[1][1].getValue() === token &&
+        board[2][0].getValue() === token
+    ) return true
+
+    return false;
+
+    
 
 }
 
+function isTie(board){
+    return board.every(row => row.every(cell => cell.getValue() !== 0))
+}
 
-function DisplayController(){}
+
+
+
+
+
+//Display
+const DisplayController = (function (){
+    const container = document.querySelector('.container')
+
+    const board = document.createElement('div');
+    board.classList.add('board')
+    container.append(board)
+
+    const game = gameController("Player 1", "Player 2")
+
+
+
+    function updateScreen(){
+
+        const boardState = game.getBoard()
+
+        const activePlayer = game.getActivePlayer();
+        activePlayer.textContent = `It's ${activePlayer}'s turn`
+
+        const cells = document.querySelectorAll('.cell')
+        
+
+        for(let i = 0; i < 3; i++){
+            for(let j = 0; j < 3; j ++){
+                const cellIndex = i * 3 + j;
+                const value = boardState[i][j].getValue();
+                cells[cellIndex].textContent = 
+                            value === 1 ? "X" : 
+                            value === 2 ? "O" : "";
+
+            }
+        }
+
+        
+
+    }
+
+
+    for(let i = 0; i < 3; i++){
+        for(let j = 0; j <3; j++){
+            const cell = document.createElement('div')
+            cell.classList.add('cell')
+            board.append(cell)
+            cell.addEventListener('click', () => {
+                game.playRound(i, j);
+                updateScreen();
+            })
+        }
+    }
+
+
+
+    updateScreen();
+    
+
+    const resetBoardBtn = document.createElement('button');
+    resetBoardBtn.classList.add('reset');
+    resetBoardBtn.textContent = "Reset";
+
+    resetBoardBtn.addEventListener('click', () => {
+        game.resetBoard(); 
+        updateScreen();   
+    });
+    container.append(resetBoardBtn);
+
+
+})();
