@@ -80,6 +80,12 @@ function gameController(player1Name = "Player One", player2Name = "Player Two")
     
 
 
+
+    const playersNameInput = (name1, name2) =>{
+        players[0].name = name1;
+        players[1].name = name2;
+    }
+
     const switchPlayerTurn = () => {
         activePlayer = activePlayer === players[0] ? players[1] : players[0];
     };
@@ -133,7 +139,9 @@ function gameController(player1Name = "Player One", player2Name = "Player Two")
  }
 
 
-    return {switchPlayerTurn, playRound, getActivePlayer, getBoard: board.getBoard, isGameOver, resetBoard: board.resetBoard }
+    return {switchPlayerTurn, playRound, getActivePlayer, 
+            getBoard: board.getBoard, isGameOver, 
+            resetBoard: board.resetBoard, playersNameInput }
 
 }
 
@@ -184,13 +192,26 @@ function isTie(board){
 
 //Display
 const DisplayController = (function (){
-    const container = document.querySelector('.container')
+    const container = document.querySelector('.container');
+
+    const statusDiv = document.createElement('div');
+    statusDiv.classList.add('status');
+    container.append(statusDiv);
 
     const board = document.createElement('div');
     board.classList.add('board')
     container.append(board)
 
-    const game = gameController("Player 1", "Player 2")
+    const game = gameController("Player 1", "Player 2");
+
+    //Input names
+    const name1 = prompt("Enter Player 1 name") || "Player 1";
+    const name2 = prompt("Enter Player 2 name") || "Player 2";
+
+    
+    game.playersNameInput(name1, name2);
+
+    container.append(name1, name2);
 
 
 
@@ -199,7 +220,8 @@ const DisplayController = (function (){
         const boardState = game.getBoard()
 
         const activePlayer = game.getActivePlayer();
-        activePlayer.textContent = `It's ${activePlayer}'s turn`
+        statusDiv.textContent = `It's ${activePlayer.name}'s turn`
+    
 
         const cells = document.querySelectorAll('.cell')
         
@@ -243,6 +265,12 @@ const DisplayController = (function (){
 
     resetBoardBtn.addEventListener('click', () => {
         game.resetBoard(); 
+        updateScreen();   
+
+        const newName1 = prompt("Enter Player 1 name") || "Player 1";
+        const newName2 = prompt("Enter Player 2 name") || "Player 2";
+        game.playersNameInput(newName1, newName2);
+
         updateScreen();   
     });
     container.append(resetBoardBtn);
